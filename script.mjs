@@ -1,4 +1,5 @@
 import { render } from "./render.mjs";
+import { fetchAPI } from "./api.js";
 
 console.log("We'll start after we've eaten one 🍕");
 
@@ -8,18 +9,10 @@ const clickHandler = async () => {
   try {
     console.log("We are eating one 🍕");
 
-    const responses = await Promise.all([
-      fetch("https://reqres.in/api/users?page=1"),
-      fetch("https://reqres.in/api/users?page=2"),
+    const pages = await Promise.all([
+      fetchAPI("/users?page=1"),
+      fetchAPI("/users?page=2"),
     ]);
-
-    if (!responses.every((response) => response.ok)) {
-      throw new Error("Erreur HTTP");
-    }
-
-    const pages = await Promise.all(
-      responses.map((response) => response.json()),
-    );
 
     const users = [...pages[0].data, ...pages[1].data];
 

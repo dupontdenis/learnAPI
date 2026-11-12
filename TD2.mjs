@@ -1,4 +1,5 @@
 import { render } from "./render.mjs";
+import { fetchAPI } from "./api.js";
 
 const btn = document.querySelector(".btn");
 
@@ -6,13 +7,7 @@ const clickHandler = async () => {
   try {
     const randomId = Math.floor(Math.random() * 12) + 1;
 
-    const response = await fetch(`https://reqres.in/api/users/${randomId}`);
-
-    if (!response.ok) {
-      throw new Error("Erreur HTTP");
-    }
-
-    const data = await response.json();
+    const data = await fetchAPI(`/users/${randomId}`);
 
     document
       .querySelector(".row")
