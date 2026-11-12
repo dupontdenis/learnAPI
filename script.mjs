@@ -1,4 +1,4 @@
-import {render} from "./render.mjs"
+import { render } from "./render.mjs";
 
 console.log("We'll start after we've eaten one 🍕");
 
@@ -7,12 +7,30 @@ const btn = document.querySelector(".btn");
 const clickHandler = async () => {
   try {
     console.log("We are eating one 🍕");
-    const response = await fetch("https://reqres.in/api/users");
-    const data = await response.json();
 
-    const randomUser = data.data[Math.floor(Math.random() * data.data.length)];
+    const responses = await Promise.all([
+      fetch("https://reqres.in/api/users?page=1"),
+      fetch("https://reqres.in/api/users?page=2"),
+    ]);
 
-    document.querySelector("#app").innerHTML = render(randomUser);
+    if (!responses.every((response) => response.ok)) {
+      throw new Error("Erreur HTTP");
+    }
+
+    const pages = await Promise.all(
+      responses.map((response) => response.json()),
+    );
+
+    const users = [...pages[0].data, ...pages[1].data];
+
+    const randomIndex = Math.floor(Math.random() * users.length);
+    const randomUser = users[randomIndex];
+
+    btn.insertAdjacentHTML("beforeend", `<span> id=${randomUser.id}, </span>`);
+
+    document
+      .querySelector(".row")
+      .insertAdjacentHTML("beforeend", render(randomUser));
   } catch (error) {
     console.error("Error fetching users:", error);
   }
